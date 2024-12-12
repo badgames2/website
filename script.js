@@ -60,14 +60,17 @@ for (let i = 0; i < 20; i++) {
 // Add event listener for mouse movement
 let lastMouseX = 0;
 let lastMouseY = 0;
+let mouseMoving = false;
 canvas.addEventListener('mousemove', (e) => {
   const mouseX = e.clientX;
   const mouseY = e.clientY;
 
+  mouseMoving = true;
+
   // Update shapes
   shapes.forEach((shape) => {
-    shape.speedX += (mouseX - lastMouseX) / 10;
-    shape.speedY += (mouseY - lastMouseY) / 10;
+    shape.speedX += (mouseX - lastMouseX) / 100;
+    shape.speedY += (mouseY - lastMouseY) / 100;
     shape.update();
   });
 
@@ -87,6 +90,33 @@ canvas.addEventListener('mousemove', (e) => {
   lastMouseX = mouseX;
   lastMouseY = mouseY;
 });
+
+// Animation loop
+function animate() {
+  if (!mouseMoving) {
+    // Update shapes
+    shapes.forEach((shape) => {
+      shape.update();
+    });
+
+    // Check for collisions
+    for (let i = 0; i < shapes.length; i++) {
+      for (let j = i + 1; j < shapes.length; j++) {
+        shapes[i].collide(shapes[j]);
+      }
+    }
+
+    // Draw shapes
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    shapes.forEach((shape) => {
+      shape.draw();
+    });
+  }
+
+  requestAnimationFrame(animate);
+}
+
+animate();
 
 // Initial draw
 ctx.clearRect(0, 0, canvas.width, canvas.height);
